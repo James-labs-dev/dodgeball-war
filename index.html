@@ -11,36 +11,49 @@
       margin: 0; 
       overflow: hidden; 
       font-family: 'Fredoka', system-ui, sans-serif; 
-      cursor: crosshair; 
+      cursor: default; 
       user-select: none; 
       background: #0f172a;
       color: #fff;
     }
-    
-    /* GIMKIT-STYLE FLOATING HUD CARDS */
-    .gim-card {
+
+    #webgl-container {
+      display: none;
       position: absolute;
-      background: #1e293b;
-      border: 4px solid #334155;
-      border-radius: 20px;
-      z-index: 10;
-      box-shadow: 0 10px 0 #0f172a;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1;
+    }
+    
+    /* HOME SCREEN LAYOUT */
+    #home-screen-wrapper {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 100;
+      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* MAIN MENU / HOMEPAGE OVERLAY */
-    #main-menu {
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 460px;
-      padding: 24px;
-      text-align: center;
+    .gim-card {
       background: #1e293b;
+      border: 4px solid #334155;
+      border-radius: 24px;
+      box-shadow: 0 12px 0 #0f172a;
+    }
+
+    #main-menu {
+      width: 480px;
+      padding: 28px;
+      text-align: center;
       border: 5px solid #38bdf8;
-      box-shadow: 0 14px 0 #0284c7;
+      box-shadow: 0 16px 0 #0284c7;
     }
 
     .gim-title {
-      font-size: 36px;
+      font-size: 40px;
       font-weight: 700;
       margin: 0 0 10px 0;
       color: #facc15;
@@ -54,30 +67,33 @@
       gap: 6px;
       background: #fef08a;
       color: #854d0e;
-      padding: 6px 16px;
+      padding: 8px 20px;
       border-radius: 999px;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 20px;
       border: 3px solid #eab308;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     /* TAB NAVIGATION */
     .tab-bar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 8px;
-      font-size: 14px;
+      padding: 10px;
+      font-size: 15px;
       background: #334155;
       color: #94a3b8;
       border: none;
       border-radius: 12px;
       box-shadow: 0 4px 0 #1e293b;
+      cursor: pointer;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
     }
 
     .tab-btn.active {
@@ -89,36 +105,35 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* STARTER PACK BOX */
     .offer-box {
       background: #312e81;
       border: 3px solid #6366f1;
       border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 15px;
+      padding: 14px;
+      margin-bottom: 18px;
       box-shadow: 0 6px 0 #1e1b4b;
     }
 
-    /* GIMKIT BOLD BUTTONS */
     button {
-      padding: 12px 18px; 
-      margin: 6px 0;
+      padding: 14px 20px; 
+      margin: 8px 0;
       cursor: pointer; 
       display: block; 
       width: 100%;
       background: #22c55e;
       color: white; 
       border: none; 
-      border-radius: 14px;
+      border-radius: 16px;
       font-family: 'Fredoka', sans-serif;
       font-weight: 700; 
-      font-size: 18px;
+      font-size: 20px;
       text-transform: uppercase;
       box-shadow: 0 6px 0 #15803d;
       transition: all 0.1s ease;
     }
     button:hover { transform: translateY(-2px); filter: brightness(1.1); }
     button:active { transform: translateY(4px); box-shadow: 0 2px 0 #15803d; }
+    button:disabled { background: #475569; box-shadow: 0 6px 0 #1e293b; cursor: not-allowed; filter: none; transform: none; }
 
     .btn-blue { background: #3b82f6; box-shadow: 0 6px 0 #1d4ed8; }
     .btn-blue:active { box-shadow: 0 2px 0 #1d4ed8; }
@@ -129,7 +144,12 @@
     .btn-purple { background: #a855f7; box-shadow: 0 6px 0 #6b21a8; }
     .btn-purple:active { box-shadow: 0 2px 0 #6b21a8; }
 
-    /* IN-GAME TOP HUD */
+    /* IN-GAME HUD */
+    .hud-element {
+      position: absolute;
+      z-index: 10;
+    }
+
     #top-bar {
       top: 15px; left: 50%;
       transform: translateX(-50%);
@@ -149,7 +169,6 @@
     .ally-badge { background: #0284c7; color: #e0f2fe; }
     .enemy-badge { background: #dc2626; color: #fef2f2; }
 
-    /* IN-GAME LEFT DASHBOARD */
     #hud-left {
       top: 15px; left: 15px;
       padding: 16px;
@@ -181,7 +200,6 @@
       text-align: center;
     }
 
-    /* IN-GAME ARMORY POPUP */
     #armory-menu {
       position: absolute;
       top: 50%; left: 50%;
@@ -217,53 +235,54 @@
 </head>
 <body>
 
-  <!-- GIMKIT STYLE HOME SCREEN -->
-  <div id="main-menu" class="gim-card">
-    <h1 class="gim-title">DODGEBALL WAR</h1>
-    
-    <div class="coin-badge">
-      🪙 <span id="menu-coins">50</span>
-    </div>
-
-    <!-- TABS NAVIGATION -->
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="showTab('battle-tab', this)">Battle</button>
-      <button class="tab-btn" onclick="showTab('shop-tab', this)">Shop</button>
-      <button class="tab-btn" onclick="showTab('gear-tab', this)">Loadout</button>
-    </div>
-
-    <!-- BATTLE TAB -->
-    <div id="battle-tab" class="tab-content active">
-      <button onclick="startMatch()">▶ Enter Battle</button>
+  <!-- CLEAN HOME SCREEN (NO 3D ARENA VISIBLE) -->
+  <div id="home-screen-wrapper">
+    <div id="main-menu" class="gim-card">
+      <h1 class="gim-title">DODGEBALL WAR</h1>
       
-      <div class="offer-box">
-        <h3 style="margin: 0 0 4px 0; color: #a5b4fc;">💥 STARTER PACK</h3>
-        <p style="font-size: 12px; margin: 0 0 8px 0; color: #c7d2fe;">10 Grenades, 5 Clusters & Fast Shooter!</p>
-        <button class="btn-orange" style="font-size: 14px; padding: 8px;" onclick="buyStarterPack()">Buy Pack (50 🪙)</button>
+      <div class="coin-badge">
+        🪙 <span id="menu-coins">50</span>
       </div>
-    </div>
 
-    <!-- SHOP TAB -->
-    <div id="shop-tab" class="tab-content">
-      <p style="font-size: 14px; color: #94a3b8; margin-top: 0;">Unlock Character Skins</p>
-      <button class="btn-blue" onclick="buyBlueSkin()">Blue Suit (20 🪙)</button>
-    </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="showTab('battle-tab', this)">Battle</button>
+        <button class="tab-btn" onclick="showTab('shop-tab', this)">Shop</button>
+        <button class="tab-btn" onclick="showTab('gear-tab', this)">Loadout</button>
+      </div>
 
-    <!-- LOADOUT TAB -->
-    <div id="gear-tab" class="tab-content">
-      <p style="font-size: 14px; color: #94a3b8;">Equipped Skin: <strong id="skin-text" style="color: #38bdf8;">Green</strong></p>
-      <p style="font-size: 12px; color: #64748b;">Press [E] during battle to open the In-Game Armory!</p>
+      <div id="battle-tab" class="tab-content active">
+        <button onclick="startMatch()">▶ Enter Battle</button>
+        
+        <div class="offer-box">
+          <h3 style="margin: 0 0 4px 0; color: #a5b4fc;">💥 STARTER PACK</h3>
+          <p style="font-size: 13px; margin: 0 0 8px 0; color: #c7d2fe;">10 Grenades, 5 Clusters & Fast Shooter (Permanent!)</p>
+          <button id="starter-pack-btn" class="btn-orange" style="font-size: 15px; padding: 10px;" onclick="buyStarterPack()">Buy Pack (50 🪙)</button>
+        </div>
+      </div>
+
+      <div id="shop-tab" class="tab-content">
+        <p style="font-size: 14px; color: #94a3b8; margin-top: 0;">Unlock Character Skins</p>
+        <button id="blue-skin-btn" class="btn-blue" onclick="buyBlueSkin()">Blue Suit (20 🪙)</button>
+      </div>
+
+      <div id="gear-tab" class="tab-content">
+        <p style="font-size: 14px; color: #94a3b8;">Equipped Skin: <strong id="skin-text" style="color: #38bdf8;">Green</strong></p>
+        <p style="font-size: 14px; color: #94a3b8;">Equipped Weapon: <strong id="weapon-text" style="color: #facc15;">Standard</strong></p>
+        <p style="font-size: 12px; color: #64748b;">Press [E] during battle to open the In-Game Armory!</p>
+      </div>
     </div>
   </div>
 
-  <!-- IN-GAME HUD TOP -->
-  <div id="top-bar" class="gim-card" style="display: none;">
+  <!-- WebGL Container for 3D Game Canvas -->
+  <div id="webgl-container"></div>
+
+  <!-- IN-GAME HUD -->
+  <div id="top-bar" class="gim-card hud-element" style="display: none;">
     <span class="team-badge ally-badge">ALLIES: <span id="ally-count">19</span></span>
     <span class="team-badge enemy-badge">ENEMIES: <span id="enemy-count">20</span></span>
   </div>
 
-  <!-- IN-GAME HUD LEFT -->
-  <div id="hud-left" class="gim-card" style="display: none;">
+  <div id="hud-left" class="gim-card hud-element" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
       <strong style="color: #facc15;">COINS:</strong>
       <span id="game-coins" style="font-weight: bold; font-size: 18px;">0</span>
@@ -297,12 +316,11 @@
     <button class="btn-purple" style="font-size: 12px; padding: 6px; margin-top:4px;" onclick="endMatch()">Quit Match</button>
   </div>
 
-  <!-- IN-GAME ARMORY POPUP -->
   <div id="armory-menu">
     <h2 style="margin-top:0; color:#facc15;">ARMORY SHOP</h2>
     <p>Coins: <span id="armory-coins">0</span> 🪙</p>
-    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('rapid')">Fast Shooter (10 🪙)</button>
-    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('heavy')">Heavy Launcher (25 🪙)</button>
+    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('Fast Shooter')">Fast Shooter (10 🪙)</button>
+    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('Heavy Launcher')">Heavy Launcher (25 🪙)</button>
     <button class="btn-blue" style="font-size:14px;" onclick="buyGrenade()">Grenade (5 🪙)</button>
     <button class="btn-purple" style="font-size:14px;" onclick="buyCluster()">Cluster Ball (15 🪙)</button>
     <button class="btn-blue" style="font-size:14px;" onclick="buildBarricade()">Barricade (10 🪙)</button>
@@ -311,17 +329,19 @@
   </div>
 
   <script>
+    // PERMANENT GAME STATE (PERSISTENT VIA LOCALSTORAGE)
     let coins = parseInt(localStorage.getItem('myGameCoins')) || 50; 
     let ownsBlueSkin = localStorage.getItem('ownsBlueSkin') === 'true'; 
+    let ownsStarterPack = localStorage.getItem('ownsStarterPack') === 'true';
+    let currentWeapon = localStorage.getItem('myWeapon') || 'Standard';
+    let myGrenades = parseInt(localStorage.getItem('myGrenades')) || 0;
+    let myClusters = parseInt(localStorage.getItem('myClusters')) || 0;
     let myColor = ownsBlueSkin ? 0x3b82f6 : 0x22c55e;
     
     let isPlaying = false;
     let isDowned = false;
     let matchEnding = false;
     let myAmmo = 50; 
-    let myGrenades = 0;
-    let myClusters = 0;
-    let currentWeapon = 'standard';
 
     let baseHp = 400;
     let medicHp = 10;
@@ -337,6 +357,15 @@
     let shakeDuration = 0;
     let shakeIntensity = 0;
 
+    function saveState() {
+      localStorage.setItem('myGameCoins', coins);
+      localStorage.setItem('ownsBlueSkin', ownsBlueSkin);
+      localStorage.setItem('ownsStarterPack', ownsStarterPack);
+      localStorage.setItem('myWeapon', currentWeapon);
+      localStorage.setItem('myGrenades', myGrenades);
+      localStorage.setItem('myClusters', myClusters);
+    }
+
     function showTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -349,10 +378,23 @@
       document.getElementById('armory-coins').innerText = coins;
       document.getElementById('game-coins').innerText = coins;
       document.getElementById('skin-text').innerText = ownsBlueSkin ? "Blue Suit" : "Green Suit";
+      document.getElementById('weapon-text').innerText = currentWeapon;
       document.getElementById('game-ammo').innerText = myAmmo;
       document.getElementById('game-grenades').innerText = myGrenades;
       document.getElementById('game-clusters').innerText = myClusters;
       document.getElementById('power-fill').style.width = throwPower + '%';
+
+      const starterBtn = document.getElementById('starter-pack-btn');
+      if (ownsStarterPack) {
+        starterBtn.innerText = "PURCHASED (PERMANENT)";
+        starterBtn.disabled = true;
+      }
+
+      const blueBtn = document.getElementById('blue-skin-btn');
+      if (ownsBlueSkin) {
+        blueBtn.innerText = "UNLOCKED";
+        blueBtn.disabled = true;
+      }
       
       const basePct = Math.max(0, (baseHp / 400) * 100);
       const baseFill = document.getElementById('base-fill');
@@ -368,30 +410,28 @@
       document.getElementById('medic-hp').innerText = statusText;
       document.getElementById('downed-status').style.display = isDowned ? "block" : "none";
     }
-    updateUI();
 
     function buyBlueSkin() {
       if (!ownsBlueSkin && coins >= 20) {
         coins -= 20;
         ownsBlueSkin = true;
-        localStorage.setItem('myGameCoins', coins);
-        localStorage.setItem('ownsBlueSkin', 'true');
         myColor = 0x3b82f6;
-        playerBody.material.color.setHex(myColor);
+        saveState();
+        if (playerBody) playerBody.material.color.setHex(myColor);
         updateUI();
       }
     }
 
     function buyStarterPack() {
-      if (coins >= 50) {
+      if (!ownsStarterPack && coins >= 50) {
         coins -= 50;
+        ownsStarterPack = true;
         myGrenades += 10;
         myClusters += 5;
         currentWeapon = 'Fast Shooter';
-        localStorage.setItem('myGameCoins', coins);
+        saveState();
         updateUI();
-        alert("Starter Pack Claimed! (+10 Grenades, +5 Clusters, Fast Shooter)");
-      } else {
+      } else if (coins < 50) {
         alert("You need 50 coins for this pack!");
       }
     }
@@ -404,18 +444,21 @@
     }
 
     function buyWeapon(type) {
-      if (type === 'rapid' && coins >= 10) { coins -= 10; currentWeapon = 'Fast Shooter'; } 
-      else if (type === 'heavy' && coins >= 25) { coins -= 25; currentWeapon = 'Heavy Launcher'; }
-      localStorage.setItem('myGameCoins', coins);
-      updateUI();
+      let cost = type === 'Heavy Launcher' ? 25 : 10;
+      if (coins >= cost) {
+        coins -= cost;
+        currentWeapon = type;
+        saveState();
+        updateUI();
+      }
     }
 
     function buyGrenade() {
-      if (coins >= 5) { coins -= 5; myGrenades++; localStorage.setItem('myGameCoins', coins); updateUI(); }
+      if (coins >= 5) { coins -= 5; myGrenades++; saveState(); updateUI(); }
     }
 
     function buyCluster() {
-      if (coins >= 15) { coins -= 15; myClusters++; localStorage.setItem('myGameCoins', coins); updateUI(); }
+      if (coins >= 15) { coins -= 15; myClusters++; saveState(); updateUI(); }
     }
 
     function buildBarricade() {
@@ -427,7 +470,7 @@
         barricade.receiveShadow = true;
         scene.add(barricade);
         barricades.push({ mesh: barricade, hp: 50 });
-        localStorage.setItem('myGameCoins', coins);
+        saveState();
         updateUI();
       }
     }
@@ -435,7 +478,7 @@
     function callArtillery() {
       if (coins >= 50 && isPlaying && !isDowned) {
         coins -= 50;
-        localStorage.setItem('myGameCoins', coins);
+        saveState();
         updateUI();
         for (let i = 0; i < 8; i++) {
           setTimeout(() => {
@@ -454,7 +497,7 @@
       }
     }
 
-    // --- THREE.JS ENGINE SETUP ---
+    // THREE.JS ENGINE SETUP
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
     scene.fog = new THREE.FogExp2(0x0f172a, 0.008);
@@ -464,7 +507,7 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    document.body.appendChild(renderer.domElement);
+    document.getElementById('webgl-container').appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xddeeff, 0.6));
     const dirLight = new THREE.DirectionalLight(0xfffaed, 1.2);
@@ -499,8 +542,8 @@
       lineMesh.position.set(0, 0.08, zPos);
       scene.add(lineMesh);
     }
-    createLine(15, 0x38bdf8);
-    createLine(-15, 0xf87171);
+    createLine(15, 0x38bdf8);  // Friendly Zone Boundary
+    createLine(-15, 0xf87171); // Enemy Zone Boundary
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -509,23 +552,31 @@
       mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     });
 
+    // FIXED AVATAR CREATION & ROTATION ANCHOR
     function createAvatar(colorHex, scale = 1) {
       const group = new THREE.Group();
-      const bodyMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.5 * scale, 0.5 * scale, 1.5 * scale, 16), new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.4 }));
+      
+      const bodyMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.5 * scale, 0.5 * scale, 1.5 * scale, 16),
+        new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.4 })
+      );
       bodyMesh.position.y = 0.75 * scale;
       bodyMesh.castShadow = true;
       group.add(bodyMesh);
 
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 0.3 * scale, 0.4 * scale), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 }));
+      const visor = new THREE.Mesh(
+        new THREE.BoxGeometry(0.6 * scale, 0.3 * scale, 0.4 * scale),
+        new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 })
+      );
       visor.position.set(0, 1.2 * scale, -0.2 * scale);
       group.add(visor);
 
       return { group: group, body: bodyMesh };
     }
 
-    const playerSetup = createAvatar(myColor);
-    const player = playerSetup.group;
-    const playerBody = playerSetup.body;
+    let playerSetup = createAvatar(myColor);
+    let player = playerSetup.group;
+    let playerBody = playerSetup.body;
     scene.add(player);
 
     let keys = {};
@@ -570,7 +621,7 @@
     });
 
     function throwBall(startPos, targetPoint, team, speedMultiplier = 0.6, upForce = 0.25, isCluster = false) {
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(isCluster ? 0.5 : 0.4, 16, 16), new THREE.MeshStandardMaterial({ 
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(isCluster ? 0.6 : 0.4, 16, 16), new THREE.MeshStandardMaterial({ 
         color: team === 'ally' ? (isCluster ? 0xa855f7 : 0x38bdf8) : 0xef4444,
         emissive: team === 'ally' ? 0x0284c7 : 0x991b1b,
         emissiveIntensity: 0.4
@@ -598,6 +649,7 @@
     function throwGrenade() {
       if (myGrenades <= 0 || isDowned) return;
       myGrenades--;
+      saveState();
       updateUI();
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObject(floor);
@@ -617,6 +669,7 @@
     function throwCluster() {
       if (myClusters <= 0 || isDowned) return;
       myClusters--;
+      saveState();
       updateUI();
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObject(floor);
@@ -666,9 +719,15 @@
     }
 
     function startMatch() {
-      document.getElementById('main-menu').style.display = 'none';
+      // Refresh persistent skin color
+      playerBody.material.color.setHex(myColor);
+
+      document.getElementById('home-screen-wrapper').style.display = 'none';
+      document.getElementById('webgl-container').style.display = 'block';
       document.getElementById('top-bar').style.display = 'flex';
       document.getElementById('hud-left').style.display = 'block';
+      
+      document.body.style.cursor = 'crosshair';
       isPlaying = true;
       isDowned = false;
       matchEnding = false;
@@ -677,10 +736,9 @@
       baseHp = 400;
       medicHp = 10;
       medicState = 'idle';
-      currentWeapon = 'standard';
       throwPower = 0;
       isCharging = false;
-      player.rotation.z = 0;
+      player.rotation.set(0, 0, 0); // Clean orientation reset
       updateUI();
       
       player.position.set(0, 0, 30); 
@@ -694,9 +752,10 @@
       medicShield.visible = false;
       scene.add(medicShield);
 
-      for(let i=0; i<18; i++) spawnBot('ally', 0x0288d1, 15, 40);
-      for(let i=0; i<19; i++) spawnBot('enemy', 0xdc2626, -40, -15);
-      spawnBot('enemy', 0x991b1b, -42, -38, true); 
+      // SPAWN NPCS
+      for(let i=0; i<18; i++) spawnBot('ally', 0x0288d1, 5, 30);
+      for(let i=0; i<19; i++) spawnBot('enemy', 0xdc2626, -30, -5);
+      spawnBot('enemy', 0x991b1b, -30, -10, true); 
       
       updateCounts();
     }
@@ -727,16 +786,20 @@
         if (bot.team === 'enemy') coins += bot.isBoss ? 20 : 2;
         scene.remove(bot.group);
         bots.splice(index, 1);
+        saveState();
         updateCounts();
         updateUI();
       }
     }
 
     function endMatch() {
+      document.getElementById('webgl-container').style.display = 'none';
       document.getElementById('top-bar').style.display = 'none';
       document.getElementById('hud-left').style.display = 'none';
       document.getElementById('armory-menu').style.display = 'none';
-      document.getElementById('main-menu').style.display = 'block';
+      document.getElementById('home-screen-wrapper').style.display = 'flex';
+      
+      document.body.style.cursor = 'default';
       isPlaying = false;
       isCharging = false;
       isDowned = false;
@@ -754,6 +817,8 @@
       particles.length = 0;
       barricades.length = 0;
       bots.length = 0;
+      
+      player.rotation.set(0, 0, 0);
     }
 
     function updateCounts() {
@@ -765,7 +830,7 @@
       if (enemies === 0 && isPlaying && !matchEnding) {
         matchEnding = true;
         coins += 30;
-        localStorage.setItem('myGameCoins', coins);
+        saveState();
         updateUI();
         showDamageNumber(player.position, "VICTORY!");
         setTimeout(() => { alert("VICTORY! +30 Coins"); endMatch(); }, 3000);
@@ -784,6 +849,7 @@
           updateUI();
         }
 
+        // PLAYER MOVEMENT & HARD BOUNDARY PRESERVATION
         if (!isDowned && !matchEnding) {
           let newX = player.position.x;
           let newZ = player.position.z;
@@ -792,10 +858,10 @@
           if (keys['a']) newX -= 0.18;
           if (keys['d']) newX += 0.18;
           player.position.x = Math.max(-45, Math.min(45, newX));
-          player.position.z = Math.max(-45, Math.min(45, newZ));
+          player.position.z = Math.max(-14.0, Math.min(45, newZ)); 
         }
 
-        // MEDIC AI LOGIC
+        // MEDIC LOGIC
         if (medicHp > 0 && medicMesh) {
           if ((myAmmo < 50 || isDowned) && medicState === 'idle') {
             medicState = 'deploying';
@@ -814,7 +880,7 @@
               medicMesh.position.z += (dz / dist) * 0.15;
             } else {
               myAmmo = 50;
-              if (isDowned) { isDowned = false; player.rotation.z = 0; }
+              if (isDowned) { isDowned = false; player.rotation.set(0, 0, 0); }
               medicState = 'returning';
               updateUI();
             }
@@ -866,7 +932,7 @@
           if (p.life <= 0) { scene.remove(p.mesh); particles.splice(i, 1); }
         }
 
-        // BALL PHYSICS
+        // BALL PHYSICS & CLUSTER
         for (let i = balls.length - 1; i >= 0; i--) {
           let b = balls[i];
           
@@ -889,9 +955,20 @@
               
               if (b.isCluster) {
                 createExplosion(b.mesh.position);
-                for (let c = 0; c < 5; c++) {
-                  let subPoint = new THREE.Vector3(b.mesh.position.x + (Math.random()*6-3), 0, b.mesh.position.z + (Math.random()*6-3));
-                  throwBall(b.mesh.position, subPoint, 'ally', 0.4, 0.2);
+                for (let c = 0; c < 8; c++) {
+                  let angle = (c / 8) * Math.PI * 2;
+                  let targetSub = new THREE.Vector3(
+                    b.mesh.position.x + Math.cos(angle) * 7.0, 
+                    0, 
+                    b.mesh.position.z + Math.sin(angle) * 7.0
+                  );
+                  throwBall(b.mesh.position, targetSub, 'ally', 0.5, 0.25);
+                }
+
+                for (let j = bots.length - 1; j >= 0; j--) {
+                  if (bots[j].group.position.distanceTo(b.mesh.position) < 6.0) {
+                    damageBot(j, 35);
+                  }
                 }
               }
               b.team = 'none';
@@ -927,9 +1004,9 @@
 
             for (let j = bots.length - 1; j >= 0; j--) {
               let bot = bots[j];
-              if (b.team !== bot.team && b.team !== 'none' && b.mesh.position.distanceTo(bot.group.position) < (bot.isBoss ? 2.5 : 1.5)) {
+              if (b.team !== bot.team && b.team !== 'none' && b.mesh.position.distanceTo(bot.group.position) < (bot.isBoss ? 2.5 : 1.8)) {
                 b.isAirborne = false;
-                damageBot(j, b.isCluster ? 30 : 20);
+                damageBot(j, b.isCluster ? 35 : 25);
                 break;
               }
             }
@@ -944,45 +1021,54 @@
           }
         }
 
-        // BOTS AI
+        // AGGRESSIVE NPC AI
         for (let bot of bots) {
           let dx = bot.targetX - bot.group.position.x;
           let dz = bot.targetZ - bot.group.position.z;
           let dist = Math.sqrt(dx*dx + dz*dz);
           
           if (dist > 1) {
-            bot.group.position.x += (dx/dist) * 0.08;
-            bot.group.position.z += (dz/dist) * 0.08;
+            bot.group.position.x += (dx/dist) * 0.09;
+            bot.group.position.z += (dz/dist) * 0.09;
           } else {
             bot.targetX = (Math.random() * 80) - 40;
-            bot.targetZ = bot.team === 'enemy' ? (Math.random() * 25 - 40) : (Math.random() * 25 + 15);
+            bot.targetZ = (Math.random() * 26) - 13; 
+          }
+
+          if (bot.team === 'enemy') {
+            bot.group.position.z = Math.min(-0.5, Math.max(-42, bot.group.position.z));
+          } else {
+            bot.group.position.z = Math.max(0.5, Math.min(42, bot.group.position.z));
           }
 
           if (bot.ammo > 0) {
             bot.timer++;
-            if (bot.timer > (bot.isBoss ? 45 : 90) && Math.random() < 0.05) {
+            if (bot.timer > (bot.isBoss ? 45 : 80) && Math.random() < 0.08) {
               bot.ammo--;
               bot.timer = 0;
-              let targetPoint = bot.team === 'enemy' ? player.position.clone() : new THREE.Vector3(bot.group.position.x, 0, -30);
-              throwBall(bot.group.position, targetPoint, bot.team, bot.isBoss ? 0.7 : 0.5, 0.2);
+              let targetPoint = bot.team === 'enemy' 
+                ? (Math.random() > 0.4 ? player.position.clone() : new THREE.Vector3((Math.random()*40)-20, 0, 20))
+                : new THREE.Vector3((Math.random()*60)-30, 0, -25);
+              throwBall(bot.group.position, targetPoint, bot.team, bot.isBoss ? 0.7 : 0.55, 0.22);
             }
           }
         }
+
+        // CAMERA SHAKE & FOLLOW
+        let shakeX = (Math.random() - 0.5) * shakeIntensity;
+        let shakeY = (Math.random() - 0.5) * shakeIntensity;
+        if (shakeDuration > 0) shakeDuration--;
+        else shakeIntensity = 0;
+
+        camera.position.x = player.position.x + shakeX;
+        camera.position.z = player.position.z + 6 + shakeY; 
+        camera.position.y = 6;                              
+        camera.lookAt(player.position.x, 1.2, player.position.z - 8); 
+
+        renderer.render(scene, camera);
       }
-
-      // CAMERA POSITIONING
-      let shakeX = (Math.random() - 0.5) * shakeIntensity;
-      let shakeY = (Math.random() - 0.5) * shakeIntensity;
-      if (shakeDuration > 0) shakeDuration--;
-      else shakeIntensity = 0;
-
-      camera.position.x = player.position.x + shakeX;
-      camera.position.z = player.position.z + 6 + shakeY; 
-      camera.position.y = 6;                              
-      camera.lookAt(player.position.x, 1.2, player.position.z - 8); 
-
-      renderer.render(scene, camera);
     }
+    updateUI();
     animate();
   </script>
 </body>
