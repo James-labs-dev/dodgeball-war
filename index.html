@@ -3,122 +3,207 @@
 <head>
   <title>Dodgeball Base War</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap');
+
+    * { box-sizing: border-box; }
+
     body { 
       margin: 0; 
       overflow: hidden; 
-      font-family: 'Segoe UI', system-ui, sans-serif; 
+      font-family: 'Fredoka', system-ui, sans-serif; 
       cursor: crosshair; 
       user-select: none; 
+      background: #0f172a;
+      color: #fff;
     }
     
-    /* GLASSMORPHISM SCREENS */
-    .screen {
+    /* GIMKIT-STYLE FLOATING HUD CARDS */
+    .gim-card {
       position: absolute;
-      color: white;
-      background: rgba(12, 18, 28, 0.88);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
+      background: #1e293b;
+      border: 4px solid #334155;
+      border-radius: 20px;
       z-index: 10;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 0 #0f172a;
     }
 
+    /* MAIN MENU / HOMEPAGE OVERLAY */
     #main-menu {
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      padding: 28px;
+      width: 460px;
+      padding: 24px;
       text-align: center;
-      min-width: 340px;
+      background: #1e293b;
+      border: 5px solid #38bdf8;
+      box-shadow: 0 14px 0 #0284c7;
     }
 
-    /* TOP STATUS BAR */
+    .gim-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      color: #facc15;
+      text-shadow: 0 4px 0 #ca8a04;
+      letter-spacing: 1px;
+    }
+
+    .coin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef08a;
+      color: #854d0e;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 18px;
+      border: 3px solid #eab308;
+      margin-bottom: 15px;
+    }
+
+    /* TAB NAVIGATION */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      font-size: 14px;
+      background: #334155;
+      color: #94a3b8;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 0 #1e293b;
+    }
+
+    .tab-btn.active {
+      background: #38bdf8;
+      color: #0f172a;
+      box-shadow: 0 4px 0 #0284c7;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* STARTER PACK BOX */
+    .offer-box {
+      background: #312e81;
+      border: 3px solid #6366f1;
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 0 #1e1b4b;
+    }
+
+    /* GIMKIT BOLD BUTTONS */
+    button {
+      padding: 12px 18px; 
+      margin: 6px 0;
+      cursor: pointer; 
+      display: block; 
+      width: 100%;
+      background: #22c55e;
+      color: white; 
+      border: none; 
+      border-radius: 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700; 
+      font-size: 18px;
+      text-transform: uppercase;
+      box-shadow: 0 6px 0 #15803d;
+      transition: all 0.1s ease;
+    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    button:active { transform: translateY(4px); box-shadow: 0 2px 0 #15803d; }
+
+    .btn-blue { background: #3b82f6; box-shadow: 0 6px 0 #1d4ed8; }
+    .btn-blue:active { box-shadow: 0 2px 0 #1d4ed8; }
+
+    .btn-orange { background: #f97316; box-shadow: 0 6px 0 #c2410c; }
+    .btn-orange:active { box-shadow: 0 2px 0 #c2410c; }
+
+    .btn-purple { background: #a855f7; box-shadow: 0 6px 0 #6b21a8; }
+    .btn-purple:active { box-shadow: 0 2px 0 #6b21a8; }
+
+    /* IN-GAME TOP HUD */
     #top-bar {
       top: 15px; left: 50%;
       transform: translateX(-50%);
-      display: flex; gap: 20px;
-      padding: 10px 24px;
-      align-items: center;
+      display: flex; gap: 15px;
+      padding: 8px 20px;
+      background: #1e293b;
+      border: 3px solid #475569;
+      box-shadow: 0 6px 0 #0f172a;
     }
 
-    .team-counter { font-weight: bold; font-size: 15px; letter-spacing: 0.5px; }
-    .ally-badge { color: #2196f3; }
-    .enemy-badge { color: #f44336; }
+    .team-badge {
+      font-weight: 700;
+      font-size: 16px;
+      padding: 4px 12px;
+      border-radius: 10px;
+    }
+    .ally-badge { background: #0284c7; color: #e0f2fe; }
+    .enemy-badge { background: #dc2626; color: #fef2f2; }
 
-    /* SIDEBAR DASHBOARD */
+    /* IN-GAME LEFT DASHBOARD */
     #hud-left {
       top: 15px; left: 15px;
-      padding: 18px;
-      width: 260px;
+      padding: 16px;
+      width: 240px;
+      border: 3px solid #475569;
     }
 
-    /* HEALTH & POWER BARS */
     .bar-bg {
-      width: 100%; height: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
+      width: 100%; height: 14px;
+      background: #0f172a;
+      border-radius: 8px;
       overflow: hidden;
       margin-top: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 2px solid #334155;
     }
     .bar-fill { height: 100%; transition: width 0.2s ease, background-color 0.2s ease; }
-    #base-fill { background: #4caf50; width: 100%; }
-    #medic-fill { background: #00e676; width: 100%; }
-    #power-fill { background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336); width: 0%; }
+    #base-fill { background: #22c55e; width: 100%; }
+    #medic-fill { background: #10b981; width: 100%; }
+    #power-fill { background: linear-gradient(90deg, #22c55e, #eab308, #ef4444); width: 0%; }
 
-    /* TACTICAL BADGES */
-    .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
-    .badge {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 5px 8px;
-      border-radius: 6px;
+    .stat-pills { display: flex; gap: 6px; margin: 10px 0; }
+    .pill {
+      flex: 1;
+      background: #334155;
+      padding: 6px;
+      border-radius: 10px;
       font-size: 12px;
-      font-weight: 600;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-weight: 700;
+      text-align: center;
     }
-
-    /* BUTTON STYLING */
-    button {
-      padding: 10px 14px; margin: 5px 0;
-      cursor: pointer; display: block; width: 100%;
-      background: linear-gradient(135deg, #1e88e5, #1565c0);
-      color: white; border: none; border-radius: 8px;
-      font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; transition: all 0.15s ease;
-    }
-    button:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4); }
-    .buy-btn { background: linear-gradient(135deg, #ff9800, #e65100); }
-    .buy-btn:hover { box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4); }
-    
-    #downed-status {
-      color: #ff3333; font-weight: 800; text-align: center;
-      animation: pulse 1s infinite alternate; margin: 8px 0 0 0;
-    }
-    @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
 
     /* IN-GAME ARMORY POPUP */
     #armory-menu {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      color: white;
-      background: rgba(10, 15, 25, 0.95);
-      padding: 25px;
-      border-radius: 12px;
-      border: 2px solid #ffd700;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 20px;
+      border: 4px solid #facc15;
+      box-shadow: 0 10px 0 #854d0e;
       display: none;
       z-index: 20;
       text-align: center;
-      min-width: 300px;
-      box-shadow: 0 0 25px rgba(255,215,0,0.3);
+      width: 320px;
     }
 
     .damage-num {
       position: absolute;
-      color: #ffeb3b;
-      font-weight: bold;
-      font-size: 20px;
+      color: #facc15;
+      font-weight: 700;
+      font-size: 24px;
       pointer-events: none;
-      text-shadow: 0 0 5px #000;
+      text-shadow: 0 3px 0 #000;
       animation: floatUp 0.8s ease-out forwards;
       z-index: 30;
     }
@@ -132,80 +217,102 @@
 </head>
 <body>
 
-  <div id="main-menu" class="screen">
-    <h1 style="margin: 0 0 10px 0; color: #ffd700;">Dodgeball Base War</h1>
-    <p>Coins: <span id="menu-coins">50</span> 🪙</p>
-    <button onclick="startMatch()">▶ Start Battle</button>
+  <div id="main-menu" class="gim-card">
+    <h1 class="gim-title">DODGEBALL WAR</h1>
     
-    <div style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px;">
-      <h3 style="margin: 0 0 5px 0; color: #ffd700;">💥 Grenade Starter Pack</h3>
-      <p style="font-size: 12px; margin: 0 0 10px 0;">Includes 10 Grenades, 5 Clusters, & Fast Shooter!</p>
-      <button class="buy-btn" onclick="buyStarterPack()">Buy Pack (50 Coins)</button>
+    <div class="coin-badge">
+      🪙 <span id="menu-coins">50</span>
     </div>
 
-    <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-    <button style="background: linear-gradient(135deg, #008CBA, #005A9C);" onclick="buyBlueSkin()">Buy Blue Armor (20 Coins)</button>
-    <p style="font-size: 13px; opacity: 0.8; margin-bottom:0;">Skin: <span id="skin-text">Green</span></p>
-  </div>
-
-  <div id="top-bar" class="screen" style="display: none;">
-    <span class="team-counter ally-badge">ALLIES: <span id="ally-count">19</span></span>
-    <span style="opacity: 0.3;">|</span>
-    <span class="team-counter enemy-badge">ENEMIES: <span id="enemy-count">20</span></span>
-  </div>
-
-  <div id="hud-left" class="screen" style="display: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <strong style="color: #ffd700;">COINS:</strong>
-      <span id="game-coins" style="font-weight: bold;">0</span>
+    <!-- TABS NAVIGATION -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab('battle-tab', this)">Battle</button>
+      <button class="tab-btn" onclick="showTab('shop-tab', this)">Shop</button>
+      <button class="tab-btn" onclick="showTab('gear-tab', this)">Loadout</button>
     </div>
 
-    <div style="margin-bottom: 8px;">
-      <small>BASE INTEGRITY</small>
+    <!-- BATTLE TAB -->
+    <div id="battle-tab" class="tab-content active">
+      <button onclick="startMatch()">▶ Enter Battle</button>
+      
+      <div class="offer-box">
+        <h3 style="margin: 0 0 4px 0; color: #a5b4fc;">💥 STARTER PACK</h3>
+        <p style="font-size: 12px; margin: 0 0 8px 0; color: #c7d2fe;">10 Grenades, 5 Clusters & Fast Shooter!</p>
+        <button class="btn-orange" style="font-size: 14px; padding: 8px;" onclick="buyStarterPack()">Buy Pack (50 🪙)</button>
+      </div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div id="shop-tab" class="tab-content">
+      <p style="font-size: 14px; color: #94a3b8; margin-top: 0;">Unlock Character Skins</p>
+      <button class="btn-blue" onclick="buyBlueSkin()">Blue Suit (20 🪙)</button>
+    </div>
+
+    <!-- LOADOUT TAB -->
+    <div id="gear-tab" class="tab-content">
+      <p style="font-size: 14px; color: #94a3b8;">Equipped Skin: <strong id="skin-text" style="color: #38bdf8;">Green</strong></p>
+      <p style="font-size: 12px; color: #64748b;">Press [E] during battle to open the In-Game Armory!</p>
+    </div>
+  </div>
+
+  <!-- IN-GAME HUD TOP -->
+  <div id="top-bar" class="gim-card" style="display: none;">
+    <span class="team-badge ally-badge">ALLIES: <span id="ally-count">19</span></span>
+    <span class="team-badge enemy-badge">ENEMIES: <span id="enemy-count">20</span></span>
+  </div>
+
+  <!-- IN-GAME HUD LEFT -->
+  <div id="hud-left" class="gim-card" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+      <strong style="color: #facc15;">COINS:</strong>
+      <span id="game-coins" style="font-weight: bold; font-size: 18px;">0</span>
+    </div>
+
+    <div style="margin-bottom: 6px;">
+      <small style="font-size: 11px; color: #94a3b8;">BASE INTEGRITY</small>
       <div class="bar-bg"><div id="base-fill" class="bar-fill"></div></div>
     </div>
 
-    <div style="margin-bottom: 12px;">
-      <small>MEDIC STATUS</small>
+    <div style="margin-bottom: 8px;">
+      <small style="font-size: 11px; color: #94a3b8;">MEDIC HP</small>
       <div class="bar-bg"><div id="medic-fill" class="bar-fill"></div></div>
       <span id="medic-hp" style="font-size: 11px; opacity: 0.8;">In Base</span>
     </div>
 
-    <div class="badge-row">
-      <div class="badge">BALLS: <span id="game-ammo" style="color:#ffd700;">50</span></div>
-      <div class="badge">NADES: <span id="game-grenades" style="color:#ff9800;">0</span></div>
-      <div class="badge">CLUSTER: <span id="game-clusters" style="color:#ff00ff;">0</span></div>
+    <div class="stat-pills">
+      <div class="pill" style="color:#facc15;">BALLS<br><span id="game-ammo">50</span></div>
+      <div class="pill" style="color:#f97316;">NADES<br><span id="game-grenades">0</span></div>
+      <div class="pill" style="color:#a855f7;">CLUSTER<br><span id="game-clusters">0</span></div>
     </div>
 
     <div style="margin-bottom: 10px;">
-      <small>THROW POWER</small>
+      <small style="font-size: 11px; color: #94a3b8;">POWER LEVEL</small>
       <div class="bar-bg"><div id="power-fill" class="bar-fill"></div></div>
     </div>
 
-    <p id="downed-status" style="display:none;">⚠️ DOWNED! MEDIC DEPLOYED</p>
+    <p id="downed-status" style="display:none; color: #ef4444; font-weight: 700; text-align: center; margin: 4px 0;">⚠️ DOWNED! MEDIC EN ROUTE</p>
 
-    <button class="buy-btn" onclick="toggleArmory()">🛒 Armory [E]</button>
-    <button style="background: linear-gradient(135deg, #d32f2f, #b71c1c);" onclick="endMatch()">Quit Match</button>
-    <p style="font-size:11px; margin: 4px 0 0 0; opacity:0.7; text-align:center;">WASD: Move | Click: Throw | E: Shop</p>
+    <button class="btn-orange" style="font-size: 14px; padding: 8px;" onclick="toggleArmory()">🛒 Armory [E]</button>
+    <button class="btn-purple" style="font-size: 12px; padding: 6px; margin-top:4px;" onclick="endMatch()">Quit Match</button>
   </div>
 
+  <!-- IN-GAME ARMORY POPUP -->
   <div id="armory-menu">
-    <h3 style="margin-top:0; color:#ffd700;">In-Game Armory</h3>
-    <p>Coins: <span id="armory-coins">0</span></p>
-    <button class="buy-btn" onclick="buyWeapon('rapid')">Fast Shooter (10 Coins)</button>
-    <button class="buy-btn" onclick="buyWeapon('heavy')">Heavy Launcher (25 Coins)</button>
-    <button class="buy-btn" onclick="buyGrenade()">Grenade (5 Coins)</button>
-    <button class="buy-btn" onclick="buyCluster()">Cluster Ball (15 Coins)</button>
-    <button class="buy-btn" onclick="buildBarricade()">Build Barricade (10 Coins)</button>
-    <button class="buy-btn" onclick="callArtillery()">Artillery Strike (50 Coins)</button>
-    <br>
-    <button style="background:#555;" onclick="toggleArmory()">Resume Battle [E]</button>
+    <h2 style="margin-top:0; color:#facc15;">ARMORY SHOP</h2>
+    <p>Coins: <span id="armory-coins">0</span> 🪙</p>
+    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('rapid')">Fast Shooter (10 🪙)</button>
+    <button class="btn-orange" style="font-size:14px;" onclick="buyWeapon('heavy')">Heavy Launcher (25 🪙)</button>
+    <button class="btn-blue" style="font-size:14px;" onclick="buyGrenade()">Grenade (5 🪙)</button>
+    <button class="btn-purple" style="font-size:14px;" onclick="buyCluster()">Cluster Ball (15 🪙)</button>
+    <button class="btn-blue" style="font-size:14px;" onclick="buildBarricade()">Barricade (10 🪙)</button>
+    <button class="btn-orange" style="font-size:14px;" onclick="callArtillery()">Artillery (50 🪙)</button>
+    <button style="background:#475569; box-shadow:0 4px 0 #1e293b; font-size:14px;" onclick="toggleArmory()">Close [E]</button>
   </div>
 
   <script>
     let coins = parseInt(localStorage.getItem('myGameCoins')) || 50; 
     let ownsBlueSkin = localStorage.getItem('ownsBlueSkin') === 'true'; 
-    let myColor = ownsBlueSkin ? 0x1e88e5 : 0x4caf50;
+    let myColor = ownsBlueSkin ? 0x3b82f6 : 0x22c55e;
     
     let isPlaying = false;
     let isDowned = false;
@@ -229,27 +336,32 @@
     let shakeDuration = 0;
     let shakeIntensity = 0;
 
+    function showTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
     function updateUI() {
       document.getElementById('menu-coins').innerText = coins;
       document.getElementById('armory-coins').innerText = coins;
       document.getElementById('game-coins').innerText = coins;
-      document.getElementById('skin-text').innerText = ownsBlueSkin ? "Blue" : "Green";
+      document.getElementById('skin-text').innerText = ownsBlueSkin ? "Blue Suit" : "Green Suit";
       document.getElementById('game-ammo').innerText = myAmmo;
       document.getElementById('game-grenades').innerText = myGrenades;
       document.getElementById('game-clusters').innerText = myClusters;
       document.getElementById('power-fill').style.width = throwPower + '%';
       
-      // Update Base Bar Fill
       const basePct = Math.max(0, (baseHp / 400) * 100);
       const baseFill = document.getElementById('base-fill');
       baseFill.style.width = basePct + '%';
-      baseFill.style.backgroundColor = basePct > 30 ? '#4caf50' : '#f44336';
+      baseFill.style.backgroundColor = basePct > 30 ? '#22c55e' : '#ef4444';
 
-      // Update Medic Bar Fill
       const medicPct = Math.max(0, (medicHp / 10) * 100);
       const medicFill = document.getElementById('medic-fill');
       medicFill.style.width = medicPct + '%';
-      medicFill.style.backgroundColor = medicPct > 30 ? '#00e676' : '#f44336';
+      medicFill.style.backgroundColor = medicPct > 30 ? '#10b981' : '#ef4444';
 
       let statusText = medicHp > 0 ? (medicState === 'idle' ? "In Base" : "On Field") + ` (${medicHp}/10 HP)` : "DESTROYED";
       document.getElementById('medic-hp').innerText = statusText;
@@ -263,7 +375,7 @@
         ownsBlueSkin = true;
         localStorage.setItem('myGameCoins', coins);
         localStorage.setItem('ownsBlueSkin', 'true');
-        myColor = 0x1e88e5;
+        myColor = 0x3b82f6;
         playerBody.material.color.setHex(myColor);
         updateUI();
       }
@@ -277,9 +389,9 @@
         currentWeapon = 'Fast Shooter';
         localStorage.setItem('myGameCoins', coins);
         updateUI();
-        alert("Grenade Starter Pack Purchased! (+10 Grenades, +5 Clusters, Fast Shooter Unlocked)");
+        alert("Starter Pack Claimed! (+10 Grenades, +5 Clusters, Fast Shooter)");
       } else {
-        alert("Not enough coins! You need 50 coins.");
+        alert("You need 50 coins for this pack!");
       }
     }
 
@@ -341,10 +453,10 @@
       }
     }
 
-    // --- THREE.JS SCENE SETUP ---
+    // --- THREE.JS ENGINE SETUP ---
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a2332);
-    scene.fog = new THREE.FogExp2(0x1a2332, 0.008);
+    scene.background = new THREE.Color(0x0f172a);
+    scene.fog = new THREE.FogExp2(0x0f172a, 0.008);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -353,7 +465,7 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xddeeff, 0.5));
+    scene.add(new THREE.AmbientLight(0xddeeff, 0.6));
     const dirLight = new THREE.DirectionalLight(0xfffaed, 1.2);
     dirLight.position.set(20, 60, 30);
     dirLight.castShadow = true;
@@ -361,22 +473,22 @@
     dirLight.shadow.mapSize.height = 2048;
     scene.add(dirLight);
 
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 0.8 }));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }));
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(120, 24, 0xffffff, 0x3d5c2e);
+    const grid = new THREE.GridHelper(120, 24, 0x38bdf8, 0x334155);
     grid.position.y = 0.02;
     scene.add(grid);
 
     const baseGeo = new THREE.BoxGeometry(20, 6, 6);
-    const playerBase = new THREE.Mesh(baseGeo, new THREE.MeshStandardMaterial({ color: 0x2196f3, roughness: 0.3, metalness: 0.6 }));
+    const playerBase = new THREE.Mesh(baseGeo, new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3, metalness: 0.6 }));
     playerBase.position.set(0, 3, 45);
     playerBase.castShadow = true;
     scene.add(playerBase);
 
-    const enemyBase = new THREE.Mesh(baseGeo, new THREE.MeshStandardMaterial({ color: 0xf44336, roughness: 0.3, metalness: 0.6 }));
+    const enemyBase = new THREE.Mesh(baseGeo, new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3, metalness: 0.6 }));
     enemyBase.position.set(0, 3, -45);
     enemyBase.castShadow = true;
     scene.add(enemyBase);
@@ -386,8 +498,8 @@
       lineMesh.position.set(0, 0.08, zPos);
       scene.add(lineMesh);
     }
-    createLine(15, 0xffffff);
-    createLine(-15, 0xffffff);
+    createLine(15, 0x38bdf8);
+    createLine(-15, 0xf87171);
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -403,7 +515,7 @@
       bodyMesh.castShadow = true;
       group.add(bodyMesh);
 
-      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 0.3 * scale, 0.4 * scale), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.1, metalness: 0.9 }));
+      const visor = new THREE.Mesh(new THREE.BoxGeometry(0.6 * scale, 0.3 * scale, 0.4 * scale), new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 }));
       visor.position.set(0, 1.2 * scale, -0.2 * scale);
       group.add(visor);
 
@@ -425,8 +537,6 @@
     window.addEventListener('keydown', (e) => {
       const key = e.key.toLowerCase();
       keys[key] = true;
-      
-      // TOGGLE SHOP WITH E
       if (key === 'e' && isPlaying) toggleArmory();
       if (key === 'g' && isPlaying && !isDowned) throwGrenade();
       if (key === 'c' && isPlaying && !isDowned) throwCluster();
@@ -460,8 +570,8 @@
 
     function throwBall(startPos, targetPoint, team, speedMultiplier = 0.6, upForce = 0.25, isCluster = false) {
       const ball = new THREE.Mesh(new THREE.SphereGeometry(isCluster ? 0.5 : 0.4, 16, 16), new THREE.MeshStandardMaterial({ 
-        color: team === 'ally' ? (isCluster ? 0xff00ff : 0x00ffff) : 0xff3333,
-        emissive: team === 'ally' ? 0x00aaaa : 0xaa0000,
+        color: team === 'ally' ? (isCluster ? 0xa855f7 : 0x38bdf8) : 0xef4444,
+        emissive: team === 'ally' ? 0x0284c7 : 0x991b1b,
         emissiveIntensity: 0.4
       }));
       ball.castShadow = true;
@@ -491,7 +601,7 @@
       raycaster.setFromCamera(mouse, camera);
       const intersects = raycaster.intersectObject(floor);
       if (intersects.length > 0) {
-        const nade = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.5 }));
+        const nade = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 }));
         nade.position.copy(player.position);
         nade.position.y = 1.5;
         scene.add(nade);
@@ -537,7 +647,7 @@
     function createExplosion(position) {
       triggerShake(12, 0.25);
       const particleCount = 30;
-      const explosionLight = new THREE.PointLight(0xff6600, 5, 20);
+      const explosionLight = new THREE.PointLight(0xf97316, 5, 20);
       explosionLight.position.copy(position);
       scene.add(explosionLight);
 
@@ -547,7 +657,7 @@
       }, 30);
 
       for (let i = 0; i < particleCount; i++) {
-        const pMesh = new THREE.Mesh(new THREE.SphereGeometry(Math.random() * 0.3 + 0.1, 8, 8), new THREE.MeshBasicMaterial({ color: Math.random() > 0.3 ? 0xff4500 : 0xffa500, transparent: true }));
+        const pMesh = new THREE.Mesh(new THREE.SphereGeometry(Math.random() * 0.3 + 0.1, 8, 8), new THREE.MeshBasicMaterial({ color: Math.random() > 0.3 ? 0xef4444 : 0xfacc15, transparent: true }));
         pMesh.position.copy(position);
         scene.add(pMesh);
         particles.push({ mesh: pMesh, vx: (Math.random() - 0.5) * 0.8, vy: Math.random() * 0.6 + 0.2, vz: (Math.random() - 0.5) * 0.8, life: 1.0 });
@@ -574,18 +684,18 @@
       
       player.position.set(0, 0, 30); 
       
-      const medicSetup = createAvatar(0x00e676);
+      const medicSetup = createAvatar(0x10b981);
       medicMesh = medicSetup.group;
       medicMesh.position.copy(medicHome);
       scene.add(medicMesh);
 
-      medicShield = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 2, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.5 }));
+      medicShield = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 2, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.5 }));
       medicShield.visible = false;
       scene.add(medicShield);
 
       for(let i=0; i<18; i++) spawnBot('ally', 0x0288d1, 15, 40);
-      for(let i=0; i<19; i++) spawnBot('enemy', 0xd32f2f, -40, -15);
-      spawnBot('enemy', 0xaa0000, -42, -38, true); 
+      for(let i=0; i<19; i++) spawnBot('enemy', 0xdc2626, -40, -15);
+      spawnBot('enemy', 0x991b1b, -42, -38, true); 
       
       updateCounts();
     }
@@ -657,7 +767,7 @@
         localStorage.setItem('myGameCoins', coins);
         updateUI();
         showDamageNumber(player.position, "VICTORY!");
-        setTimeout(() => { alert("ENEMY FORCES ELIMINATED! VICTORY! +30 Coins"); endMatch(); }, 3000);
+        setTimeout(() => { alert("VICTORY! +30 Coins"); endMatch(); }, 3000);
       }
     }
 
@@ -684,7 +794,7 @@
           player.position.z = Math.max(-45, Math.min(45, newZ));
         }
 
-        // MEDIC LOGIC
+        // MEDIC AI LOGIC
         if (medicHp > 0 && medicMesh) {
           if ((myAmmo < 50 || isDowned) && medicState === 'idle') {
             medicState = 'deploying';
@@ -766,7 +876,7 @@
             b.vy -= 0.015; 
             
             if (Math.random() > 0.5) {
-              let tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), new THREE.MeshBasicMaterial({ color: b.team === 'ally' ? 0x00ffff : 0xff3333, transparent: true }));
+              let tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), new THREE.MeshBasicMaterial({ color: b.team === 'ally' ? 0x38bdf8 : 0xef4444, transparent: true }));
               tMesh.position.copy(b.mesh.position);
               scene.add(tMesh);
               particles.push({ mesh: tMesh, vx: 0, vy: 0, vz: 0, life: 0.4 });
@@ -786,7 +896,6 @@
               b.team = 'none';
             }
 
-            // HIT BARRICADES
             for (let j = barricades.length - 1; j >= 0; j--) {
               if (b.mesh.position.distanceTo(barricades[j].mesh.position) < 2.5) {
                 barricades[j].hp -= 10;
@@ -796,7 +905,6 @@
               }
             }
 
-            // HIT BASE
             if (b.team === 'enemy' && b.mesh.position.distanceTo(playerBase.position) < 10) {
               baseHp -= 10;
               b.isAirborne = false;
@@ -805,7 +913,6 @@
               if (baseHp <= 0) { alert("BASE DESTROYED! Defeat."); endMatch(); return; }
             }
 
-            // HIT PLAYER
             if (b.team === 'enemy' && !isDowned && b.mesh.position.distanceTo(player.position) < 1.5) {
               b.isAirborne = false;
               if (medicHp > 0) {
@@ -813,11 +920,10 @@
                 player.rotation.z = Math.PI / 2;
                 updateUI();
               } else {
-                alert("You were eliminated in action and the Medic is gone! Base lost."); endMatch(); return;
+                alert("Eliminated in action!"); endMatch(); return;
               }
             }
 
-            // HIT BOTS
             for (let j = bots.length - 1; j >= 0; j--) {
               let bot = bots[j];
               if (b.team !== bot.team && b.team !== 'none' && b.mesh.position.distanceTo(bot.group.position) < (bot.isBoss ? 2.5 : 1.5)) {
