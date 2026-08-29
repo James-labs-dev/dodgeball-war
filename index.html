@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Web Game</title>
+  <title>3D Animal Arena Game</title>
   <style>
     * {
       box-sizing: border-box;
@@ -27,14 +27,12 @@
       pointer-events: none;
     }
     .hud-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.85);
       border: 2px solid #334155;
       border-radius: 8px;
       padding: 12px 16px;
       color: #f8fafc;
       min-width: 220px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     }
     .hud-title {
       font-size: 12px;
@@ -60,16 +58,52 @@
     .hp-bar-inner {
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, #22c55e, #16a34a);
-      transition: width 0.15s ease-out, background-color 0.15s ease;
+      background: #22c55e;
+      transition: width 0.15s ease-out;
+    }
+    #menu-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      color: #fff;
+    }
+    .menu-card {
+      background: #1e293b;
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    .btn {
+      background: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 10px 20px;
+      margin: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #7dd3fc;
     }
     #controls-hint {
       position: absolute;
       bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid #334155;
       color: #94a3b8;
       padding: 8px 16px;
@@ -81,6 +115,7 @@
 </head>
 <body>
 
+  <!-- HUD -->
   <div id="ui-container">
     <div class="hud-card">
       <div class="hud-title">Player Health</div>
@@ -94,81 +129,111 @@
     </div>
   </div>
 
-  <div id="controls-hint">Use WASD or Arrow Keys to move</div>
+  <!-- START MENU -->
+  <div id="menu-overlay">
+    <div class="menu-card">
+      <h1 style="margin-top: 0; color: #facc15;">ANIMAL ARENA</h1>
+      <p style="color: #94a3b8;">Select your character to enter battle:</p>
+      <div>
+        <button class="btn" onclick="startGame('Bear')">Bear (High HP)</button>
+        <button class="btn" onclick="startGame('Bunny')">Bunny (Fast)</button>
+        <button class="btn" onclick="startGame('Cat')">Cat (Balanced)</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- Three.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <div id="controls-hint">WASD / Arrows to Move | Space to Attack</div>
+
+  <!-- Three.js Library -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
   <script>
-    // --- 1. LOCAL SAVE CONTROLLER ---
+    // --- 1. LOCAL SAVE SYSTEM ---
     const SaveSystem = {
       KEY: 'game_save_data_v1',
       save(data) {
-        try {
-          localStorage.setItem(this.KEY, JSON.stringify(data));
-        } catch (e) {
-          console.warn('Save failed:', e);
-        }
+        try { localStorage.setItem(this.KEY, JSON.stringify(data)); }
+        catch (e) { console.warn('Save error:', e); }
       },
       load(defaultData) {
         try {
           const raw = localStorage.getItem(this.KEY);
           return raw ? { ...defaultData, ...JSON.parse(raw) } : defaultData;
-        } catch (e) {
-          return defaultData;
-        }
+        } catch (e) { return defaultData; }
       }
     };
 
-    let gameState = SaveSystem.load({ coins: 0 });
+    let gameState = SaveSystem.load({ coins: 0, unlockedCharacters: ['Bear'] });
     document.getElementById('coin-count').innerText = gameState.coins;
 
     // --- 2. THREE.JS SCENE SETUP ---
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0f172a);
-    scene.fog = new THREE.FogExp2(0x0f172a, 0.015);
 
-    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(20, 40, 20);
-    dirLight.castShadow = true;
+    dirLight.position.set(15, 30, 15);
     scene.add(dirLight);
 
-    // Ground Plane
-    const grid = new THREE.GridHelper(100, 50, 0x38bdf8, 0x1e293b);
-    grid.position.y = 0;
+    // Arena Court
+    const grid = new THREE.GridHelper(80, 40, 0x38bdf8, 0x334155);
     scene.add(grid);
 
-    // --- 3. ENTITY CLASS (PLAYER & BOTS) ---
+    // --- 3. CHARACTER MESH BUILDER ---
+    function buildCharacterMesh(type) {
+      const group = new THREE.Group();
+      let color = 0x38bdf8;
+      
+      if (type === 'Bear') color = 0x8b5cf6; // Purple
+      if (type === 'Bunny') color = 0x38bdf8; // Light Blue
+      if (type === 'Cat') color = 0xfacc15; // Yellow
+      if (type === 'Enemy') color = 0xef4444; // Red
+
+      const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.3 });
+
+      // Body
+      const bodyGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 16);
+      const body = new THREE.Mesh(bodyGeo, mat);
+      body.position.y = 0.6;
+      group.add(body);
+
+      // Head
+      const headGeo = new THREE.SphereGeometry(0.4, 16, 16);
+      const head = new THREE.Mesh(headGeo, mat);
+      head.position.y = 1.3;
+      group.add(head);
+
+      return group;
+    }
+
+    // --- 4. ENTITY CLASS (HP & ACTIONS) ---
     class Entity {
-      constructor(color, x, z, maxHp, isPlayer = false) {
+      constructor(type, x, z, maxHp, isPlayer = false) {
+        this.type = type;
         this.maxHp = maxHp;
         this.hp = maxHp;
         this.isPlayer = isPlayer;
 
-        // Visual Representation
-        const geometry = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
-        const material = new THREE.MeshStandardMaterial({ color, roughness: 0.3 });
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.mesh.position.set(x, 1, z);
-        this.mesh.castShadow = true;
+        this.mesh = buildCharacterMesh(type);
+        this.mesh.position.set(x, 0, z);
         scene.add(this.mesh);
 
-        // Simple Floating Overhead HP Indicator Mesh for Non-Player Entities
+        // Enemy HP Indicator
         if (!isPlayer) {
-          const hpGeo = new THREE.BoxGeometry(1.2, 0.15, 0.15);
+          const hpGeo = new THREE.BoxGeometry(1.2, 0.12, 0.12);
           const hpMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
           this.hpMesh = new THREE.Mesh(hpGeo, hpMat);
-          this.hpMesh.position.set(0, 1.2, 0);
+          this.hpMesh.position.set(0, 2.0, 0);
           this.mesh.add(this.hpMesh);
         }
       }
@@ -184,60 +249,48 @@
       updateHealthUI() {
         if (this.isPlayer) {
           const hpPercent = (this.hp / this.maxHp) * 100;
-          const hpBar = document.getElementById('hp-fill');
-          hpBar.style.width = `${hpPercent}%`;
-          
-          if (hpPercent < 30) {
-            hpBar.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
-          } else if (hpPercent < 60) {
-            hpBar.style.background = 'linear-gradient(90deg, #facc15, #eab308)';
-          } else {
-            hpBar.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
-          }
+          document.getElementById('hp-fill').style.width = `${hpPercent}%`;
         } else if (this.hpMesh) {
-          const scale = this.hp / this.maxHp;
-          this.hpMesh.scale.x = scale;
+          this.hpMesh.scale.x = this.hp / this.maxHp;
         }
       }
 
       onDeath() {
         scene.remove(this.mesh);
+        if (!this.isPlayer) {
+          gameState.coins += 10;
+          document.getElementById('coin-count').innerText = gameState.coins;
+          SaveSystem.save(gameState);
+        }
       }
     }
 
-    // Spawn Entities
-    const player = new Entity(0x38bdf8, 0, 0, 100, true);
+    let player = null;
+    let enemies = [];
 
-    const enemies = [
-      new Entity(0xef4444, 6, -8, 50),
-      new Entity(0xef4444, -7, -12, 50),
-      new Entity(0xef4444, 10, -15, 50)
-    ];
-
-    // --- 4. CAMERA CONFIGURATION (HIGH & BEHIND) ---
-    // Offset values: Elevated above (Y) and pulled back behind (Z)
+    // --- 5. CAMERA SYSTEM (HIGH & BEHIND) ---
     const CAMERA_OFFSET = new THREE.Vector3(0, 10, 12);
 
     function updateCamera() {
-      // Set camera relative to player position
+      if (!player) return;
       camera.position.x = player.mesh.position.x + CAMERA_OFFSET.x;
       camera.position.y = player.mesh.position.y + CAMERA_OFFSET.y;
       camera.position.z = player.mesh.position.z + CAMERA_OFFSET.z;
-
-      // Look slightly ahead of the player to maintain visibility behind them
-      const lookAtTarget = player.mesh.position.clone().add(new THREE.Vector3(0, 0.5, -2));
-      camera.lookAt(lookAtTarget);
+      camera.lookAt(player.mesh.position.x, player.mesh.position.y + 0.8, player.mesh.position.z);
     }
 
-    // --- 5. INPUT & MOVEMENT LOGIC ---
+    // --- 6. CONTROLS & ATTACK LOGIC ---
     const keys = {};
-    window.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+    window.addEventListener('keydown', (e) => {
+      keys[e.key.toLowerCase()] = true;
+      if (e.code === 'Space') attack();
+    });
     window.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
 
-    const moveSpeed = 0.18;
+    let moveSpeed = 0.16;
 
-    function handleMovement() {
-      if (player.hp <= 0) return;
+    function handleInput() {
+      if (!player || player.hp <= 0) return;
 
       if (keys['w'] || keys['arrowup']) player.mesh.position.z -= moveSpeed;
       if (keys['s'] || keys['arrowdown']) player.mesh.position.z += moveSpeed;
@@ -245,17 +298,48 @@
       if (keys['d'] || keys['arrowright']) player.mesh.position.x += moveSpeed;
     }
 
-    // --- 6. MAIN GAME LOOP ---
+    function attack() {
+      if (!player || player.hp <= 0) return;
+
+      enemies.forEach((enemy) => {
+        if (enemy.hp > 0) {
+          const dist = player.mesh.position.distanceTo(enemy.mesh.position);
+          if (dist < 3.0) {
+            enemy.takeDamage(25);
+          }
+        }
+      });
+    }
+
+    // --- 7. GAME INITIALIZATION ---
+    function startGame(characterType) {
+      document.getElementById('menu-overlay').style.display = 'none';
+
+      let hp = 100;
+      if (characterType === 'Bear') { hp = 150; moveSpeed = 0.14; }
+      if (characterType === 'Bunny') { hp = 80; moveSpeed = 0.22; }
+      if (characterType === 'Cat') { hp = 100; moveSpeed = 0.17; }
+
+      player = new Entity(characterType, 0, 0, hp, true);
+
+      // Spawn Enemies
+      enemies = [
+        new Entity('Enemy', 6, -8, 50),
+        new Entity('Enemy', -7, -10, 50),
+        new Entity('Enemy', 10, -14, 50)
+      ];
+    }
+
+    // --- 8. RENDER LOOP ---
     function animate() {
       requestAnimationFrame(animate);
 
-      handleMovement();
+      handleInput();
       updateCamera();
 
       renderer.render(scene, camera);
     }
 
-    // Window Resizing Handler
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
