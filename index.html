@@ -1,27 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Base Defense War - Ultimate Tactical Update</title>
+  <title>Dodgeball Base War</title>
   <style>
-    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; cursor: crosshair; }
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      font-family: 'Segoe UI', system-ui, sans-serif; 
+      cursor: crosshair; 
+      user-select: none; 
+    }
     
+    /* GLASSMORPHISM SCREENS */
     .screen {
       position: absolute;
-      top: 10px;
-      left: 10px;
       color: white;
-      background: rgba(15, 20, 30, 0.88);
-      padding: 16px 20px;
-      border-radius: 10px;
+      background: rgba(12, 18, 28, 0.88);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
       z-index: 10;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
+    #main-menu {
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 28px;
+      text-align: center;
+      min-width: 340px;
+    }
+
+    /* TOP STATUS BAR */
+    #top-bar {
+      top: 15px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 20px;
+      padding: 10px 24px;
+      align-items: center;
+    }
+
+    .team-counter { font-weight: bold; font-size: 15px; letter-spacing: 0.5px; }
+    .ally-badge { color: #2196f3; }
+    .enemy-badge { color: #f44336; }
+
+    /* SIDEBAR DASHBOARD */
+    #hud-left {
+      top: 15px; left: 15px;
+      padding: 18px;
+      width: 260px;
+    }
+
+    /* HEALTH & POWER BARS */
+    .bar-bg {
+      width: 100%; height: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .bar-fill { height: 100%; transition: width 0.2s ease, background-color 0.2s ease; }
+    #base-fill { background: #4caf50; width: 100%; }
+    #medic-fill { background: #00e676; width: 100%; }
+    #power-fill { background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336); width: 0%; }
+
+    /* TACTICAL BADGES */
+    .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+    .badge {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* BUTTON STYLING */
+    button {
+      padding: 10px 14px; margin: 5px 0;
+      cursor: pointer; display: block; width: 100%;
+      background: linear-gradient(135deg, #1e88e5, #1565c0);
+      color: white; border: none; border-radius: 8px;
+      font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; transition: all 0.15s ease;
+    }
+    button:hover { transform: translateY(-2px); filter: brightness(1.15); box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4); }
+    .buy-btn { background: linear-gradient(135deg, #ff9800, #e65100); }
+    .buy-btn:hover { box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4); }
+    
+    #downed-status {
+      color: #ff3333; font-weight: 800; text-align: center;
+      animation: pulse 1s infinite alternate; margin: 8px 0 0 0;
+    }
+    @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
+
+    /* IN-GAME ARMORY POPUP */
     #armory-menu {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       color: white;
       background: rgba(10, 15, 25, 0.95);
@@ -33,43 +110,6 @@
       text-align: center;
       min-width: 300px;
       box-shadow: 0 0 25px rgba(255,215,0,0.3);
-    }
-    
-    button {
-      padding: 8px 12px;
-      margin: 4px 0;
-      cursor: pointer;
-      display: block;
-      width: 100%;
-      background: linear-gradient(135deg, #4CAF50, #2E7D32);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: transform 0.1s, filter 0.2s;
-    }
-    button:hover { filter: brightness(1.2); transform: translateY(-1px); }
-    .shop-btn { background: linear-gradient(135deg, #008CBA, #005A9C); }
-    .buy-btn { background: linear-gradient(135deg, #ff9800, #E65100); }
-    
-    #ammo-display { font-size: 16px; color: #ffd700; font-weight: bold; }
-
-    #power-container {
-      width: 200px;
-      height: 14px;
-      background-color: #222;
-      border: 2px solid #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 5px;
-    }
-    #power-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
-      transition: width 0.05s linear;
     }
 
     .damage-num {
@@ -93,31 +133,60 @@
 <body>
 
   <div id="main-menu" class="screen">
-    <h2 style="margin-top:0; color:#ffd700;">Dodgeball Base War</h2>
-    <p>Coins: <span id="menu-coins">50</span></p>
-    <button onclick="startMatch()">▶ Start War Match</button>
-    <hr style="border-color: rgba(255,255,255,0.1);">
-    <h3>Permanent Shop</h3>
-    <button class="shop-btn" onclick="buyBlueSkin()">Buy Blue Skin (20 Coins)</button>
-    <p>Skin: <span id="skin-text">Green</span></p>
+    <h1 style="margin: 0 0 10px 0; color: #ffd700;">Dodgeball Base War</h1>
+    <p>Coins: <span id="menu-coins">50</span> 🪙</p>
+    <button onclick="startMatch()">▶ Start Battle</button>
+    
+    <div style="margin-top: 15px; padding: 12px; background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px;">
+      <h3 style="margin: 0 0 5px 0; color: #ffd700;">💥 Grenade Starter Pack</h3>
+      <p style="font-size: 12px; margin: 0 0 10px 0;">Includes 10 Grenades, 5 Clusters, & Fast Shooter!</p>
+      <button class="buy-btn" onclick="buyStarterPack()">Buy Pack (50 Coins)</button>
+    </div>
+
+    <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+    <button style="background: linear-gradient(135deg, #008CBA, #005A9C);" onclick="buyBlueSkin()">Buy Blue Armor (20 Coins)</button>
+    <p style="font-size: 13px; opacity: 0.8; margin-bottom:0;">Skin: <span id="skin-text">Green</span></p>
   </div>
 
-  <div id="in-game-ui" class="screen" style="display: none;">
-    <h2 style="margin-top:0;">Two Bases War</h2>
-    <p>Match Coins: <span id="game-coins">0</span></p>
-    <p id="ammo-display">Balls: <span id="game-ammo">50</span> | Nades: <span id="game-grenades">0</span> | Clusters: <span id="game-clusters">0</span></p>
-    <p>Weapon: <span id="current-weapon" style="color:#00ff00;">Standard</span></p>
-    <p>Base Health: <span id="base-hp" style="color:#00ff00;">400 / 400</span></p>
-    <p>Medic: <span id="medic-hp" style="color:#00ff00;">In Base (10/10 HP)</span></p>
-    <p id="downed-status" style="color:#ff3333; display:none; font-weight:bold;">⚠️ DOWNED! Medic on the way...</p>
-    <p>Enemies: <span id="enemy-count">20</span> | Allies: <span id="ally-count">19</span></p>
-    
-    <p style="margin-bottom:2px;"><strong>Throw Power:</strong></p>
-    <div id="power-container"><div id="power-fill"></div></div>
+  <div id="top-bar" class="screen" style="display: none;">
+    <span class="team-counter ally-badge">ALLIES: <span id="ally-count">19</span></span>
+    <span style="opacity: 0.3;">|</span>
+    <span class="team-counter enemy-badge">ENEMIES: <span id="enemy-count">20</span></span>
+  </div>
 
-    <button class="buy-btn" style="margin-top:10px;" onclick="toggleArmory()">🛒 Open Armory</button>
-    <button style="background:linear-gradient(135deg, #d32f2f, #b71c1c); margin-top:4px;" onclick="endMatch()">Quit</button>
-    <p><small>WASD: Move | Click: Throw | G: Grenade | C: Cluster | B: Cover | R: Strike</small></p>
+  <div id="hud-left" class="screen" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <strong style="color: #ffd700;">COINS:</strong>
+      <span id="game-coins" style="font-weight: bold;">0</span>
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <small>BASE INTEGRITY</small>
+      <div class="bar-bg"><div id="base-fill" class="bar-fill"></div></div>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <small>MEDIC STATUS</small>
+      <div class="bar-bg"><div id="medic-fill" class="bar-fill"></div></div>
+      <span id="medic-hp" style="font-size: 11px; opacity: 0.8;">In Base</span>
+    </div>
+
+    <div class="badge-row">
+      <div class="badge">BALLS: <span id="game-ammo" style="color:#ffd700;">50</span></div>
+      <div class="badge">NADES: <span id="game-grenades" style="color:#ff9800;">0</span></div>
+      <div class="badge">CLUSTER: <span id="game-clusters" style="color:#ff00ff;">0</span></div>
+    </div>
+
+    <div style="margin-bottom: 10px;">
+      <small>THROW POWER</small>
+      <div class="bar-bg"><div id="power-fill" class="bar-fill"></div></div>
+    </div>
+
+    <p id="downed-status" style="display:none;">⚠️ DOWNED! MEDIC DEPLOYED</p>
+
+    <button class="buy-btn" onclick="toggleArmory()">🛒 Armory [E]</button>
+    <button style="background: linear-gradient(135deg, #d32f2f, #b71c1c);" onclick="endMatch()">Quit Match</button>
+    <p style="font-size:11px; margin: 4px 0 0 0; opacity:0.7; text-align:center;">WASD: Move | Click: Throw | E: Shop</p>
   </div>
 
   <div id="armory-menu">
@@ -130,7 +199,7 @@
     <button class="buy-btn" onclick="buildBarricade()">Build Barricade (10 Coins)</button>
     <button class="buy-btn" onclick="callArtillery()">Artillery Strike (50 Coins)</button>
     <br>
-    <button style="background:#555;" onclick="toggleArmory()">Resume Battle</button>
+    <button style="background:#555;" onclick="toggleArmory()">Resume Battle [E]</button>
   </div>
 
   <script>
@@ -170,13 +239,20 @@
       document.getElementById('game-clusters').innerText = myClusters;
       document.getElementById('power-fill').style.width = throwPower + '%';
       
-      document.getElementById('base-hp').innerText = baseHp + " / 400";
-      document.getElementById('base-hp').style.color = baseHp > 100 ? "#00ff00" : "#ff3333";
+      // Update Base Bar Fill
+      const basePct = Math.max(0, (baseHp / 400) * 100);
+      const baseFill = document.getElementById('base-fill');
+      baseFill.style.width = basePct + '%';
+      baseFill.style.backgroundColor = basePct > 30 ? '#4caf50' : '#f44336';
+
+      // Update Medic Bar Fill
+      const medicPct = Math.max(0, (medicHp / 10) * 100);
+      const medicFill = document.getElementById('medic-fill');
+      medicFill.style.width = medicPct + '%';
+      medicFill.style.backgroundColor = medicPct > 30 ? '#00e676' : '#f44336';
 
       let statusText = medicHp > 0 ? (medicState === 'idle' ? "In Base" : "On Field") + ` (${medicHp}/10 HP)` : "DESTROYED";
       document.getElementById('medic-hp').innerText = statusText;
-      document.getElementById('medic-hp').style.color = medicHp > 3 ? "#00ff00" : "#ff3333";
-      document.getElementById('current-weapon').innerText = currentWeapon.toUpperCase();
       document.getElementById('downed-status').style.display = isDowned ? "block" : "none";
     }
     updateUI();
@@ -193,7 +269,22 @@
       }
     }
 
+    function buyStarterPack() {
+      if (coins >= 50) {
+        coins -= 50;
+        myGrenades += 10;
+        myClusters += 5;
+        currentWeapon = 'Fast Shooter';
+        localStorage.setItem('myGameCoins', coins);
+        updateUI();
+        alert("Grenade Starter Pack Purchased! (+10 Grenades, +5 Clusters, Fast Shooter Unlocked)");
+      } else {
+        alert("Not enough coins! You need 50 coins.");
+      }
+    }
+
     function toggleArmory() {
+      if (!isPlaying) return;
       const armory = document.getElementById('armory-menu');
       armory.style.display = armory.style.display === 'block' ? 'none' : 'block';
       updateUI();
@@ -217,9 +308,7 @@
     function buildBarricade() {
       if (coins >= 10 && isPlaying && !isDowned) {
         coins -= 10;
-        const bGeo = new THREE.BoxGeometry(4, 2, 1);
-        const bMat = new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.9 });
-        const barricade = new THREE.Mesh(bGeo, bMat);
+        const barricade = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 1), new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.9 }));
         barricade.position.set(player.position.x, 1, player.position.z - 2);
         barricade.castShadow = true;
         barricade.receiveShadow = true;
@@ -252,7 +341,7 @@
       }
     }
 
-    // --- SCENE SETUP ---
+    // --- THREE.JS SCENE SETUP ---
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a2332);
     scene.fog = new THREE.FogExp2(0x1a2332, 0.008);
@@ -264,8 +353,7 @@
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    const ambientLight = new THREE.AmbientLight(0xddeeff, 0.5);
-    scene.add(ambientLight);
+    scene.add(new THREE.AmbientLight(0xddeeff, 0.5));
     const dirLight = new THREE.DirectionalLight(0xfffaed, 1.2);
     dirLight.position.set(20, 60, 30);
     dirLight.castShadow = true;
@@ -273,9 +361,7 @@
     dirLight.shadow.mapSize.height = 2048;
     scene.add(dirLight);
 
-    const floorGeo = new THREE.PlaneGeometry(120, 120);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 0.8 }); 
-    const floor = new THREE.Mesh(floorGeo, floorMat);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.MeshStandardMaterial({ color: 0x2d4c1e, roughness: 0.8 }));
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
@@ -337,11 +423,15 @@
     const bots = [];
 
     window.addEventListener('keydown', (e) => {
-      keys[e.key.toLowerCase()] = true;
-      if (e.key.toLowerCase() === 'g' && isPlaying && !isDowned) throwGrenade();
-      if (e.key.toLowerCase() === 'c' && isPlaying && !isDowned) throwCluster();
-      if (e.key.toLowerCase() === 'b' && isPlaying && !isDowned) buildBarricade();
-      if (e.key.toLowerCase() === 'r' && isPlaying && !isDowned) callArtillery();
+      const key = e.key.toLowerCase();
+      keys[key] = true;
+      
+      // TOGGLE SHOP WITH E
+      if (key === 'e' && isPlaying) toggleArmory();
+      if (key === 'g' && isPlaying && !isDowned) throwGrenade();
+      if (key === 'c' && isPlaying && !isDowned) throwCluster();
+      if (key === 'b' && isPlaying && !isDowned) buildBarricade();
+      if (key === 'r' && isPlaying && !isDowned) callArtillery();
     });
     window.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
 
@@ -466,14 +556,13 @@
 
     function startMatch() {
       document.getElementById('main-menu').style.display = 'none';
-      document.getElementById('in-game-ui').style.display = 'block';
+      document.getElementById('top-bar').style.display = 'flex';
+      document.getElementById('hud-left').style.display = 'block';
       isPlaying = true;
       isDowned = false;
       matchEnding = false;
       
       myAmmo = 50; 
-      myGrenades = 0;
-      myClusters = 0;
       baseHp = 400;
       medicHp = 10;
       medicState = 'idle';
@@ -490,14 +579,13 @@
       medicMesh.position.copy(medicHome);
       scene.add(medicMesh);
 
-      // Deployable Medic Shield
       medicShield = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 2, 16, 1, true), new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.5 }));
       medicShield.visible = false;
       scene.add(medicShield);
 
       for(let i=0; i<18; i++) spawnBot('ally', 0x0288d1, 15, 40);
       for(let i=0; i<19; i++) spawnBot('enemy', 0xd32f2f, -40, -15);
-      spawnBot('enemy', 0xaa0000, -42, -38, true); // Boss Enemy
+      spawnBot('enemy', 0xaa0000, -42, -38, true); 
       
       updateCounts();
     }
@@ -534,7 +622,8 @@
     }
 
     function endMatch() {
-      document.getElementById('in-game-ui').style.display = 'none';
+      document.getElementById('top-bar').style.display = 'none';
+      document.getElementById('hud-left').style.display = 'none';
       document.getElementById('armory-menu').style.display = 'none';
       document.getElementById('main-menu').style.display = 'block';
       isPlaying = false;
@@ -595,7 +684,7 @@
           player.position.z = Math.max(-45, Math.min(45, newZ));
         }
 
-        // MEDIC & SHIELD LOGIC
+        // MEDIC LOGIC
         if (medicHp > 0 && medicMesh) {
           if ((myAmmo < 50 || isDowned) && medicState === 'idle') {
             medicState = 'deploying';
@@ -666,7 +755,7 @@
           if (p.life <= 0) { scene.remove(p.mesh); particles.splice(i, 1); }
         }
 
-        // BALL PHYSICS & TRAIL
+        // BALL PHYSICS
         for (let i = balls.length - 1; i >= 0; i--) {
           let b = balls[i];
           
@@ -676,7 +765,6 @@
             b.mesh.position.z += b.vz;
             b.vy -= 0.015; 
             
-            // Motion Particle Trail
             if (Math.random() > 0.5) {
               let tMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), new THREE.MeshBasicMaterial({ color: b.team === 'ally' ? 0x00ffff : 0xff3333, transparent: true }));
               tMesh.position.copy(b.mesh.position);
@@ -775,7 +863,7 @@
         }
       }
 
-      // ZOOMED-IN OVER-THE-SHOULDER CAMERA WITH REAR VIEW
+      // CAMERA POSITIONING
       let shakeX = (Math.random() - 0.5) * shakeIntensity;
       let shakeY = (Math.random() - 0.5) * shakeIntensity;
       if (shakeDuration > 0) shakeDuration--;
